@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Songs5Cinf">
         <activity
+            android:name=".Playlist"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

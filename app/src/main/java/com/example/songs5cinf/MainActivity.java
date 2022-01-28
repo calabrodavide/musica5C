@@ -2,6 +2,7 @@ package com.example.songs5cinf;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -17,10 +18,13 @@ public class MainActivity extends AppCompatActivity {
     //search fields
     EditText title;
     EditText author;
+    EditText date;
+    EditText duration;
 
     //function buttons
     Button add;
     Button search;
+    Button playlist;
 
     //search select
     Spinner genre;
@@ -41,11 +45,16 @@ public class MainActivity extends AppCompatActivity {
         //all "find view by id"
         title = (EditText) findViewById(R.id.title_text);
         author = (EditText) findViewById(R.id.author_text);
+        date = (EditText) findViewById(R.id.date_text);
+        duration = (EditText) findViewById(R.id.duration_text);
 
         add = (Button) findViewById(R.id.add_btn);
         search = (Button) findViewById(R.id.search_btn);
+        playlist = (Button) findViewById(R.id.playlist_btn);
 
         genre = (Spinner) findViewById(R.id.spinner);
+
+        date = (EditText) findViewById(R.id.date_text);
 
         //end
 
@@ -58,14 +67,21 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (manager.strIsEmpty(title.getText().toString()) || manager.strIsEmpty(author.getText().toString())) {
+
+                if (manager.strIsEmpty(title.getText().toString()) || manager.strIsEmpty(author.getText().toString())
+                || manager.strIsEmpty(date.getText().toString()) || manager.strIsEmpty(duration.getText().toString())) {
 
                     Toast.makeText(getApplicationContext(), "Non aggiunto", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    manager.addBrano(new Brano(title.getText().toString().trim(),
-                            author.getText().toString().trim(),
-                            genre.getSelectedItem().toString()));
+                    manager.addBrano(new Brano(
+                            title.getText().toString(),
+                            author.getText().toString(),
+                            genre.getSelectedItem().toString(),
+                            date.getText().toString(),
+                            duration.getText().toString()
+                    ));
+
 
                     Toast.makeText(getApplicationContext(), title.getText().toString().trim() + " aggiunto con successo",
                             Toast.LENGTH_SHORT).show();
@@ -77,39 +93,40 @@ public class MainActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (manager.strIsEmpty(title.getText().toString()) && manager.strIsEmpty(author.getText().toString())){
 
-                    Toast.makeText(getApplicationContext(), "Inserisci qualcosa", Toast.LENGTH_SHORT).show();
-                }else{
-                    ArrayList<Brano> list= manager.getBrani();
-                    for (Brano brano : list){
-                        if(title.getText().toString().trim().equals(brano.getTitolo()) ||
-                        author.getText().toString().trim().equals(brano.getAutore())){
+                manager.findBrano(MainActivity.this, new Brano(
+                        title.getText().toString(),
+                        author.getText().toString(),
+                        genre.getSelectedItem().toString(),
+                        manager.strIsEmpty(date.getText().toString())? "0" : date.getText().toString(),
+                        manager.strIsEmpty(duration.getText().toString())? "0" : duration.getText().toString()
 
-                            Toast.makeText(getApplicationContext(), "Il brano è:", Toast.LENGTH_SHORT).show();
-                            Toast.makeText(getApplicationContext(), "Titolo: " + brano.getTitolo(), Toast.LENGTH_SHORT).show();
-                            Toast.makeText(getApplicationContext(), "Autore: " + brano.getAutore(), Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                    }
-                    Toast.makeText(getApplicationContext(), "Non trovato", Toast.LENGTH_SHORT).show();
-                }
+                        ));
             }
         });
 
-        //futuro intent con playlist di tutti i brani inseriti
-        /*
-        search.setOnClickListener(new View.OnClickListener() {
+        playlist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<Brano> list = manager.getBrani();
-                for (Brano brano : list) {
-                    Toast.makeText(getApplicationContext(), brano.getTitolo(), Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(getApplicationContext(), Playlist.class);
+                StringBuilder titles = new StringBuilder();
+                StringBuilder authors = new StringBuilder();
+                ArrayList<Brano> brani = manager.getBrani();
+
+                for(Brano brano: brani){
+                    titles.append(brano.getTitolo());
+                    authors.append(brano.getAutore());
                 }
+                String res_titles = titles.toString();
+                String res_authors = authors.toString();
+
+                i.putExtra("titles", res_titles);
+                i.putExtra("authors", res_authors);
+
+                startActivity(i);
             }
         });
 
-        */
 
 
 
